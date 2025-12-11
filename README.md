@@ -55,6 +55,26 @@ Frontend:
 Infrastructure:
 - Docker, Docker Compose
 
+## Demo Screenshots
+Below are screenshots showcasing key features of the application.
+
+### **Authentication**
+| Login | Sign Up | 2FA Settings |
+|-------|--------|-------|
+| ![Login](images/login.png) | ![Sign Up](images/signup.png) | ![Account Settings](images/accountSettings.png) |
+
+### **Home / Navigation**
+| QR Code | Navigation Bar | Link Page | Your Connections |
+|--------|--------|--------|--------|
+| ![Home 1](images/home1.png) | ![Home 2](images/home2.png) | ![Link Page](images/linkPage.png) | ![Connections](images/yourConnections.png) |
+
+### **Client Forms**
+| Document Uploading | Family | Form 1 | 
+|--------|--------|--------|
+| ![Uploading](images/upload.png) | ![Family](images/family.png) | ![Form 1](images/form1.png) | 
+| Form 2 | Form 3 | Caseworker Dashboard |
+| ![Form 2](images/form2.png) | ![Form 3](images/form3.png) | ![Caseworker Dashboard](images/caseworkerDashboard.png) |
+
 ## Getting Started
 Things you'll need:
 - [Docker Desktop](https://www.docker.com/get-started/)
