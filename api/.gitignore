@@ -1,0 +1,12 @@
+.env
+db/
+_db/
+postgres_data/
+
+api.exe
+api
+
+go.sum
+
+.vscode/
+

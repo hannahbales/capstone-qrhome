@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRHome</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 2em;
+      background-color: #f4f8fb;
+      color: #2c3e50;
+    }
+    h1, h2, h3 {
+      color: #0077b6;
+    }
+    h1 {
+      border-bottom: 3px solid #00b4d8;
+      padding-bottom: 0.2em;
+    }
+    ul {
+      background: #e1ecf4;
+      padding: 1em 2em;
+      border-radius: 8px;
+      list-style-type: square;
+    }
+    p, li {
+      font-size: 1.05em;
+    }
+    .screenshot {
+      margin: 1em;
+      width: 300px;
+      border-radius: 20px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5em;
+      margin-bottom: 2em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>QRHome</h1>
+
+  <div class="section">
+    <h2>Team Members</h2>
+    <ul>
+      <li>Hannah Bales</li>
+      <li>Hunter Barclay</li>
+      <li>Brooklyn Grant</li>
+      <li>Amber Liang</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Project Abstract</h2>
+    <p>
+      <p>
+        Our project is a cross-platform application designed to simplify the housing application process for individuals experiencing homelessness. 
+        Our sponsors and their clients face lots of frustration when navigating long, repetitive forms, so we created a universal form that stores 
+        personal, family, and other information securely. Then, a QR code can be scanned by case workers, allowing them to access their client's 
+        information without needing the client to fill out the same information repeatedly and to retell their traumatic stories multiple times. 
+        The application is designed to be user-friendly and simple to use for it's users.
+      </p>
+      <p>
+        The application allows users to create secure accounts, input personal and family details, upload important documents, and generate a unique 
+        QR code to easily share their information with case workers and housing providers. This improves efficiency, reduces emotional burden, and 
+        makes resource navigation less daunting. Our app is accessible via web browsers and on mobile devices, allowing use in shelters, libraries, 
+        and other public spaces. The key features include user authentication with optional two-factor verification, data sharing with permission 
+        controls, document management, family tracking, and client-to-caseworker linking through QR codes. 
+      </p>
+    </p>
+    </div>  
+
+    <div class="section">
+    <h2>Project Description</h2>
+    <p>
+      We built an application designed to help individuals and families experiencing homelessness with the goal of making the housing application 
+      process simpler and easier. The application helps users to register, create families, enter their information, upload required documentation, 
+      and generate a scannable QR code containing their information. This QR code acts as a digital connection between clients and case workers.
+    </p>
+    <p>
+      The system is composed of a Flutter-based frontend, a Go-based backend API, and a PostgreSQL database for storage. For security, the app supports 
+      account deletion, role-based access (clients, case workers, and admins), and optional two-factor authentication. Caseworkers may find it useful 
+      to have all their clients information on a browser, after scanning multiple clients' QR codes, to help them find housing and other resources.
+      The clients will have access to a phone, so it will be more accessible for them to have an app. So we made it cross-platform, so it can be used 
+      on both web and mobile, if needed. 
+    </p>
+    <p>
+      First we have the login page, where the user can enter their email and password.
+      If they don't have an account, they can click on the "Create Account" button to register.
+    </p>
+    <img src="images/login.png" alt="Login Page" class="screenshot" />
+    <p>
+      This is the registration page, where the user can enter their information to create an account.
+      They can enter their name, email, password, and confirm their password. They also will choose if they are a client or case worker as well as 
+      enter their birthday date. 
+    </p>
+    <img src="images/signup.png" alt="Sign Up Page" class="screenshot" />
+    <h3>Client View</h3>
+    <p>
+      This is the home page for clients, where the user can see their information and the QR code that they can share with their case worker.
+      The navigation bar to the side allows the user to navigate to the Application Form, Family, your uploads, your connected caseworkers, app information, and 
+      the Log Out Button. You can get to the navigation by pressing the hamburger button in the top left corner.
+    </p>
+    <img src="images/home1.png" alt="Home Page" class="screenshot" />
+    <img src="images/home2.png" alt="Home Page with navigation" class="screenshot" />
+    
+    <p>
+      When you select Application Form, the user can see their application form and fill it out.
+      They can enter their personal information, family information, and other details required for the housing application. This is a long form,
+      so we have a navigation bar at the top to show the user how far they are in the form and what sections are left. This is also where the user 
+      can upload their documents, such as their ID, birth certificate, and other required documents. 
+    </p>
+    <img src="images/form1.png" alt="Screenshot of the form" class="screenshot" />
+    <img src="images/form2.png" alt="Screenshot of the form" class="screenshot" />
+    <img src="images/form3.png" alt="Screenshot of the form" class="screenshot" />
+    <p>
+      When you select Family, the user can see their family members and add or remove them from their family, as well as input their details 
+      and information.
+    </p>
+    <img src="images/family.png" alt="Family Page" class="screenshot" />
+    <p>
+      When you select your uploads, the user can see their uploaded documents and delete them if they want to. This is where they upload documents
+      such as their ID, birth certificate, and other required documents.
+    </p>
+    <img src="images/upload.png" alt="Uploads Page" class="screenshot" />
+    <p>
+      When you select your connections, the user can see their connected case workers and remove them if they want to. 
+      This is to ensure that the user has control over who has access to their information. They can also see their email address.
+    </p>
+    <img src="images/yourConnections.png" alt="Family Page" class="screenshot" />
+    <p>
+      This is the settings page, where the user can see their account information. They can also delete their account if they 
+      want to. This is also where the user can enable two-factor authentication, which will send a code to their email or phone number to verify their 
+      identity when logging in.
+    </p>
+    <img src="images/accountSettings.png" alt="Settings Page" class="screenshot" />
+    <h3>Case worker View</h3>
+    <p>
+      This is the home page for case workers, where the user can see their clients and access their information. They have the abilty to view their
+      clients' families, application forms, and uploads. They can also remove clients from their dashboard. The only way to add clients is by scanning their QR 
+      code, which will add them to the case worker's dashboard. This is to ensures that the only case worker has permission to access the client's
+      personal information.
+    </p>
+    <img src="images/caseworkerDashboard.png" alt="Caseworker Dashboard" class="screenshot" />
+    <p>
+      This is the what shows when the case worker scans the QR code. It will show the client name and ask if add them to their dashboard.
+    </p>
+    <img src="images/linkPage.png" alt="Screenshot of the app" class="screenshot" />
+
+    <h3>License</h3>
+    <p>SPDX-License-Identifier: MPL-2.0</p>
+  </div>
+</body>
+</html>

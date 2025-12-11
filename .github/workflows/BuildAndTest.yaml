@@ -1,0 +1,62 @@
+name: Build And Test
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build App
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Install Docker
+        run: |
+          command -v docker &>/dev/null || (curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh)
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+      - run: |
+          sudo sh build.sh
+  test:
+    name: Test App
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Install Docker
+        run: |
+          command -v docker &>/dev/null || (curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh)
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+      - name: Setup Go Dependencies
+        run: |
+          cd api
+          go get github.com/steebchen/prisma-client-go
+          go mod download github.com/steebchen/prisma-client-go
+          go run github.com/steebchen/prisma-client-go generate
+          go get -t ./...
+      - name: Run Tests
+        run: |
+          chmod a+rx test.sh
+          ./test.sh

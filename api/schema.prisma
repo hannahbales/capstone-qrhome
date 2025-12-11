@@ -1,0 +1,315 @@
+datasource db {
+  // could be postgresql or mysql
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+enum UserType {
+  CLIENT
+  CASE_WORKER
+  ADMIN
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  email               String               @unique
+  passwordHash        String
+  lastAuth            DateTime?
+  authCode            String?
+  type                UserType             @default(CLIENT)
+  twoFAEnabled        Boolean              @default(false)
+  twoFACodes          TwoFactorCode[]
+  linkCode            UserLinkCode?
+  caseworkerLinks     UserLink[]           @relation("link_caseworker")
+  clientLinks         UserLink[]           @relation("link_client")
+  personal_info_id    Int                  @unique
+  personal_info       PersonalInfo         @relation(fields: [personal_info_id], references: [id])
+  application_data    ApplicationData?
+}
+
+model UploadedFile {
+  id         Int    @id @default(autoincrement())
+  filename   String
+  file_type  String
+  mime_type  String
+  file_data  Bytes
+
+  personalInfoId Int
+  personalInfo PersonalInfo @relation(fields: [personalInfoId], references: [id])
+}
+
+model PersonalInfo {
+  id          Int     @id @default(autoincrement())
+  user        User?
+  firstName   String
+  lastName    String
+  dob         DateTime
+  phoneNumber String?
+
+  familyLinks FamilyLink[]
+  uploadedFiles UploadedFile[]
+}
+
+model FamilyMember {
+  id          Int     @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  birthday    DateTime
+  ssn         String
+  gender      String
+  relationship String
+
+  absentFamilyMemberId Int? @unique
+  absentFamilyMember    ApplicationData? @relation("absent_family_member", fields: [absentFamilyMemberId], references: [id])
+  hudRecipientId Int? @unique
+  hudRecipient    ApplicationData? @relation("hud_recipient", fields: [hudRecipientId], references: [id])
+  accessibilityId Int? @unique
+  accessibility    ApplicationData? @relation("accessibility_member", fields: [accessibilityId], references: [id])
+  membersNeedingHelpId Int? @unique
+  membersNeedingHelp    ApplicationData? @relation("members_needing_help", fields: [membersNeedingHelpId], references: [id])
+  nonResidingMemberId Int? @unique
+  nonResidingMember    ResidenceInfo? @relation("non_residing_member", fields: [nonResidingMemberId], references: [id])
+  lifetimeOffenderId Int? @unique
+  lifetimeOffender    ApplicationData? @relation("lifetime_offender", fields: [lifetimeOffenderId], references: [id])
+  violentOffenderId Int? @unique
+  violentOffender    ApplicationData? @relation("violent_offender", fields: [violentOffenderId], references: [id])
+  methConvictionId Int? @unique
+  methConviction    ApplicationData? @relation("meth_conviction", fields: [methConvictionId], references: [id])
+  drugConvictionId Int? @unique
+  drugConviction    ApplicationData? @relation("drug_conviction", fields: [drugConvictionId], references: [id])
+  
+  familyLink       FamilyLink?
+  crimeEntries CrimeEntry[]
+  IncomeAssetEntries IncomeAssetEntry[]
+}
+
+model FamilyLink {
+  id              Int     @id @default(autoincrement())
+  personalInfoId  Int
+  familyMemberId  Int @unique
+  relationship    String
+
+  personalInfo    PersonalInfo  @relation(fields: [personalInfoId], references: [id])
+  familyMember    FamilyMember  @relation(fields: [familyMemberId], references: [id])
+
+  @@unique([personalInfoId, familyMemberId])
+}
+
+model ResidenceInfo {
+  id Int @id @default(autoincrement())
+  address String @default("")
+  city String @default("")
+  state String @default("")
+  zipCode String @default("")
+  // dateIn DateTime @default(now())
+  // dateOut DateTime @default(now())
+  dateIn String @default("")
+  dateOut String @default("")
+  landlordName String @default("")
+  landlordPhone String @default("")
+  monthlyPayment String @default("")
+  residenceType String @default("")
+  otherResidenceType String @default("")
+  allReside Boolean @default(false)
+  nonResidingMembers FamilyMember[] @relation("non_residing_member")
+
+  currentResidence ApplicationData? @relation("current_residence")
+
+  previousResidencesId Int? @unique
+  previousResidences ApplicationData? @relation(name: "previous_residences", fields: [previousResidencesId], references: [id])
+}
+
+model UserLinkCode {
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @id
+  code   String @unique
+}
+
+model UserLink {
+  client        User @relation(name: "link_client", fields: [clientId], references: [id])
+  caseworker    User @relation(name: "link_caseworker", fields: [caseworkerId], references: [id])
+  clientId      Int
+  caseworkerId  Int
+  @@id(name: "userlink_id", [clientId, caseworkerId])
+}
+
+model TwoFactorCode {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@id([userId, code])  // Composite primary key on userId and code
+}
+
+model ApplicationData {
+  id Int @id @default(autoincrement())
+  user_id Int @unique
+  user User @relation(fields: [user_id], references: [id])
+  
+  // Personal
+  ssn String @default("")
+  address String @default("")
+  gender String @default("")
+  isStudent Boolean @default(false)
+  isVeteran Boolean @default(false)
+  hasDisability Boolean @default(false)
+
+  // Housing Preferences
+  housingPreferenceRankings HousingPreferenceRanking[]
+  desiredMoveInDate String @default("")
+
+  // Household Information
+  hasPets Boolean @default(false)
+  petDescription String @default("")
+  isSmoker Boolean @default(false)
+  moreThanOneResidence Boolean @default(false)
+  absentMembersExplanation String @default("")
+  absentFamilyMembers FamilyMember[] @relation("absent_family_member")
+  compositionChanges Boolean @default(false)
+  compositionChangeExplanation String @default("")
+  custody Boolean @default(false)
+  custodyExplanation String @default("")
+  elderlyEligibility Boolean @default(false)
+  disabledEligibility Boolean @default(false)
+  receivedHudJan2010 Boolean @default(false)
+  hudRecipients FamilyMember[] @relation("hud_recipient")
+  hudPropertyName String @default("")
+  needsAccessibility Boolean @default(false)
+  accessibilityMembers FamilyMember[] @relation("accessibility_member")
+  mobilityAccessible Boolean @default(false)
+  visionAccessible Boolean @default(false)
+  hearingAccessible Boolean @default(false)
+  needsSpecialAccommodations Boolean @default(false)
+  membersNeedingHelp FamilyMember[] @relation("members_needing_help")
+  accommodationDescription String @default("")
+
+  // History Information
+  currentResidenceId Int? @unique
+  currentResidence ResidenceInfo? @relation(name: "current_residence", fields: [currentResidenceId], references: [id])
+  previousResidences ResidenceInfo[] @relation("previous_residences")
+  assistanceTerminated Boolean @default(false)
+  assistanceExplanation String @default("")
+  evicted Boolean @default(false)
+  evictionExplanation String @default("")
+  owesMoney Boolean @default(false)
+  debtExplanation String @default("")
+  makingPayments Boolean @default(false)
+  bedBugs Boolean @default(false)
+  isLifetimeSexOffender Boolean @default(false)
+  lifetimeOffenders FamilyMember[] @relation("lifetime_offender")
+  isViolentOffender Boolean @default(false)
+  violentOffenders FamilyMember[] @relation("violent_offender")
+  isMethConviction Boolean @default(false)
+  methOffenders FamilyMember[] @relation("meth_conviction")
+  hasDrugCharges Boolean @default(false)
+  drugOffenders FamilyMember[] @relation("drug_conviction")
+  otherCrimes CrimeEntry[]
+
+  // Income and Assets
+  incomeAssetEntries IncomeAssetEntry[]
+  receivesGovAssistance Boolean @default(false)
+  assistanceProgramName String @default("")
+  receivesFromCurrentProperty Boolean @default(false)
+}
+
+model HousingPreferenceRanking {
+  id Int @id @default(autoincrement())
+  applicationId Int
+  application ApplicationData @relation(fields: [applicationId], references: [id])
+  preference String
+  rank String
+}
+
+model CrimeEntry {
+  id Int @id @default(autoincrement())
+  familyMemberId Int
+  familyMember FamilyMember @relation(fields: [familyMemberId], references: [id])
+  year String @default("")
+  crime String @default("")
+  city String @default("")
+  state String @default("")
+
+  applicationId Int
+  application ApplicationData @relation(fields: [applicationId], references: [id])
+}
+
+model IncomeAssetEntry {
+  id Int @id @default(autoincrement())
+  familyMemberId Int
+  familyMember FamilyMember @relation(fields: [familyMemberId], references: [id])
+  type String @default("")
+  source String @default("")
+  amount String @default("")
+  frequencyOrLocation String @default("")
+  monthlyOrValue String @default("")
+  
+  applicationId Int?
+  application ApplicationData? @relation(fields: [applicationId], references: [id])
+}
+
+enum USStateTerritory {
+  ALABAMA
+  ALASKA
+  AMERICAN_SAMOA
+  ARIZONA
+  ARKANSAS
+  CALIFORNIA
+  COLORADO
+  CONNECTICUT
+  DELAWARE
+  DISTRICT_OF_COLUMBIA
+  FLORIDA
+  GEORGIA
+  GUAM
+  HAWAII
+  IDAHO
+  ILLINOIS
+  INDIANA
+  IOWA
+  KANSAS
+  KENTUCKY
+  LOUISIANA
+  MAINE
+  MARYLAND
+  MASSACHUSETTS
+  MICHIGAN
+  MINNESOTA
+  MINOR_OUTLYING_ISLANDS
+  MISSISSIPPI
+  MISSOURI
+  MONTANA
+  NEBRASKA
+  NEVADA
+  NEW_HAMPSHIRE
+  NEW_JERSEY
+  NEW_MEXICO
+  NEW_YORK
+  NORTH_CAROLINA
+  NORTH_DAKOTA
+  NORTHERN_MARIANA_ISLANDS
+  OHIO
+  OKLAHOMA
+  OREGON
+  PENNSYLVANIA
+  PUERTO_RICO
+  RHODE_ISLAND
+  SOUTH_CAROLINA
+  SOUTH_DAKOTA
+  TENNESSEE
+  TEXAS
+  US_VIRGIN_ISLANDS
+  UTAH
+  VERMONT
+  VIRGINIA
+  WASHINGTON
+  WEST_VIRGINIA
+  WISCONSIN
+  WYOMING
+}
